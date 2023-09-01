@@ -71,9 +71,30 @@ const updateSingleCategory = async (
   return result;
 };
 
+const deleteSingleCategory = async (id: string): Promise<Category | null> => {
+  const isExist = await prisma.category.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if (!isExist) {
+    throw new Error("Category Not Found 🔴");
+  }
+
+  const result = await prisma.category.delete({
+    where: {
+      id,
+    },
+  });
+
+  return result;
+};
+
 export const categoryServices = {
   createCategory,
   getAllCategories,
   getSingleCategory,
   updateSingleCategory,
+  deleteSingleCategory,
 };
