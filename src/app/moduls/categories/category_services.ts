@@ -47,8 +47,33 @@ const getSingleCategory = async (id: string): Promise<Category | null> => {
   return result;
 };
 
+const updateSingleCategory = async (
+  id: string,
+  data: Partial<Category>
+): Promise<Category | null> => {
+  const isExist = await prisma.category.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if (!isExist) {
+    throw new Error("Category Not Found 🔴");
+  }
+
+  const result = await prisma.category.update({
+    where: {
+      id,
+    },
+    data,
+  });
+
+  return result;
+};
+
 export const categoryServices = {
   createCategory,
   getAllCategories,
   getSingleCategory,
+  updateSingleCategory,
 };
