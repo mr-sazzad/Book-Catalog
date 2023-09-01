@@ -18,3 +18,15 @@ export const createSingleUser: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const loginUser: RequestHandler = async (req, res, next) => {
+  const loginData = req.body;
+  const result = await userServices.loginUser(loginData);
+
+  res.status(201).json({
+    statusCode: 201,
+    success: true,
+    message: "User Logged In Successfully ✅",
+    data: result,
+  });
+};
