@@ -41,3 +41,15 @@ export const getAllUsers: RequestHandler = async (req, res, next) => {
     data: result,
   });
 };
+
+export const getSingleUser: RequestHandler = async (req, res, next) => {
+  const id = req.params.id;
+  const result = await userServices.getSingleUser(id);
+
+  res.status(200).json({
+    statusCode: 201,
+    success: true,
+    message: "User Retrieved Successfully 🙍",
+    data: result,
+  });
+};
