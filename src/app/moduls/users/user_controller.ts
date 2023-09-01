@@ -66,3 +66,15 @@ export const updateSingleUser: RequestHandler = async (req, res, next) => {
     data: result,
   });
 };
+
+export const deleteSingleUser: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+  const result = await userServices.deleteSingleUser(id);
+
+  res.status(200).json({
+    statusCode: 201,
+    success: true,
+    message: "User Deleted Successfully 🔴",
+    data: result,
+  });
+};
