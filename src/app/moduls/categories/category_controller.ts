@@ -51,3 +51,21 @@ export const getSingleCategory: RequestHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateSingleCategory: RequestHandler = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const payload = req.body;
+    const result = await categoryServices.updateSingleCategory(id, payload);
+
+    res.status(201).json({
+      statusCode: 201,
+      success: true,
+      message: "Categories Updated Successfully ✅",
+      data: result,
+    });
+  } catch (err: any) {
+    console.log(err);
+    next(err);
+  }
+};
