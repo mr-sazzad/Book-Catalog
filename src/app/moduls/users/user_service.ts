@@ -37,7 +37,14 @@ const loginUser = async (data: Partial<User>): Promise<string> => {
   return token;
 };
 
+const getAllUsers = async (): Promise<User[]> => {
+  const result = await prisma.user.findMany({});
+
+  return result;
+};
+
 export const userServices = {
   createSingleUser,
   loginUser,
+  getAllUsers,
 };
