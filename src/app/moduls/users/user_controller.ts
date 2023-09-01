@@ -30,3 +30,14 @@ export const loginUser: RequestHandler = async (req, res, next) => {
     data: result,
   });
 };
+
+export const getAllUsers: RequestHandler = async (req, res, next) => {
+  const result = await userServices.getAllUsers();
+
+  res.status(200).json({
+    statusCode: 201,
+    success: true,
+    message: "Users Retrieved Successfully 👨‍👩‍👧‍👦",
+    data: result,
+  });
+};
