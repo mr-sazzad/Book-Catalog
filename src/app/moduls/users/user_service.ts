@@ -53,9 +53,33 @@ const getSingleUser = async (id: string): Promise<User | null> => {
   return result;
 };
 
+const updateSingleUser = async (
+  id: string,
+  payload: Partial<User>
+): Promise<User> => {
+  const isExist = await prisma.user.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if (!isExist) {
+    throw new Error("Resource Not Found ! 🦀");
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const userServices = {
   createSingleUser,
   loginUser,
   getAllUsers,
   getSingleUser,
+  updateSingleUser,
 };
