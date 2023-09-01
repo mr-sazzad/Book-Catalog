@@ -76,10 +76,30 @@ const updateSingleUser = async (
   return result;
 };
 
+const deleteSingleUser = async (id: string): Promise<User> => {
+  const isExist = await prisma.user.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if (!isExist) {
+    throw new Error("Resource Not Found ! 🦀");
+  }
+
+  const result = await prisma.user.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const userServices = {
   createSingleUser,
   loginUser,
   getAllUsers,
   getSingleUser,
   updateSingleUser,
+  deleteSingleUser,
 };
