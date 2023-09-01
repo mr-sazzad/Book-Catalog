@@ -1,5 +1,6 @@
 import cors from "cors";
 import express, { Request, Response, urlencoded } from "express";
+import { globalRouter } from "./app/routes";
 
 const app = express();
 
@@ -22,5 +23,7 @@ app.get("/", (req: Request, res: Response) => {
     category: " base url -> http://localhost:5000/api/v1/categories ⚖️",
   });
 });
+
+app.use("/api/v1", globalRouter);
 
 export default app;
