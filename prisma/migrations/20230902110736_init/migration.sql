@@ -61,13 +61,14 @@ CREATE TABLE "Order" (
 );
 
 -- CreateTable
-CREATE TABLE "OrderdBook" (
+CREATE TABLE "OrderedBook" (
     "id" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
+    "bookId" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
 
-    CONSTRAINT "OrderdBook_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "OrderedBook_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -86,7 +87,10 @@ ALTER TABLE "ReviewAndRating" ADD CONSTRAINT "ReviewAndRating_bookId_fkey" FOREI
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderdBook" ADD CONSTRAINT "OrderdBook_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderedBook" ADD CONSTRAINT "OrderedBook_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderdBook" ADD CONSTRAINT "OrderdBook_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderedBook" ADD CONSTRAINT "OrderedBook_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "books"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderedBook" ADD CONSTRAINT "OrderedBook_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

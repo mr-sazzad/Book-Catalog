@@ -35,7 +35,7 @@ export const getAllUsers: RequestHandler = async (req, res, next) => {
   const result = await userServices.getAllUsers();
 
   res.status(200).json({
-    statusCode: 201,
+    statusCode: 200,
     success: true,
     message: "Users Retrieved Successfully 👨‍👩‍👧‍👦",
     data: result,
@@ -47,7 +47,7 @@ export const getSingleUser: RequestHandler = async (req, res, next) => {
   const result = await userServices.getSingleUser(id);
 
   res.status(200).json({
-    statusCode: 201,
+    statusCode: 200,
     success: true,
     message: "User Retrieved Successfully 🙍",
     data: result,
@@ -59,7 +59,7 @@ export const updateSingleUser: RequestHandler = async (req, res, next) => {
   const data = req.body;
   const result = await userServices.updateSingleUser(id, data);
 
-  res.status(200).json({
+  res.status(201).json({
     statusCode: 201,
     success: true,
     message: "User Updated Successfully ✅",
@@ -72,7 +72,7 @@ export const deleteSingleUser: RequestHandler = async (req, res, next) => {
   const result = await userServices.deleteSingleUser(id);
 
   res.status(200).json({
-    statusCode: 201,
+    statusCode: 200,
     success: true,
     message: "User Deleted Successfully 🔴",
     data: result,

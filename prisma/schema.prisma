@@ -22,7 +22,7 @@ model User {
 
   reviewAndRatings ReviewAndRating[]
   orders           Order[]
-  orderdBooks      OrderdBook[]
+  orderedBooks     OrderedBook[]
 
   @@map("users")
 }
@@ -48,6 +48,7 @@ model Book {
   category   Category @relation(fields: [categoryId], references: [id])
 
   reviewAndRatings ReviewAndRating[]
+  orderedBooks     OrderedBook[]
 
   @@map("books")
 }
@@ -65,21 +66,24 @@ model ReviewAndRating {
 }
 
 model Order {
-  id          String       @id @default(uuid())
-  orderdBooks OrderdBook[]
-  status      orderStatus  @default(PENDING)
-  createdAt   DateTime     @default(now())
+  id           String        @id @default(uuid())
+  orderedBooks OrderedBook[]
+  status       orderStatus   @default(PENDING)
+  createdAt    DateTime      @default(now())
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 }
 
-model OrderdBook {
+model OrderedBook {
   id       String @id @default(uuid())
   quantity Int
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id])
 
   orderId String
   order   Order  @relation(fields: [orderId], references: [id])

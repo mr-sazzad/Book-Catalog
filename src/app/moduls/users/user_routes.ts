@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { roleAuth } from "../../middleware/roleAuth";
 import {
   createSingleUser,
   deleteSingleUser,
@@ -12,9 +13,9 @@ const router = Router();
 
 router.post("/auth/signup", createSingleUser);
 router.post("/auth/signin", loginUser);
-router.get("/", getAllUsers);
+router.get("/", roleAuth(["ADMIN"]), getAllUsers);
 router.get("/:id", getSingleUser);
-router.patch("/:id", updateSingleUser);
-router.delete("/:id", deleteSingleUser);
+router.patch("/:id", roleAuth(["ADMIN"]), updateSingleUser);
+router.delete("/:id", roleAuth(["ADMIN"]), deleteSingleUser);
 
 export const userRouter = router;
