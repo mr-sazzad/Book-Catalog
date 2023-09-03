@@ -32,7 +32,7 @@ DELETE USER       /users/1da2379b-06c0-440e-9b74-6aa61bf68510
 ```js
 // BOOKS ROUTES 🦀
 
-CREATE BOOKS      /books/creat-book
+CREATE BOOKS      /books/create-book
 GET ALL BOOKS     /books
 GET SINGLE BOOK   /books/befed0db-4c32-4d0b-9aa5-fa21a7408c71
 UPDATE BOOK       /books/befed0db-4c32-4d0b-9aa5-fa21a7408c71
