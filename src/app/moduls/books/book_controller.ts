@@ -23,15 +23,20 @@ export const getAllBooks: RequestHandler = async (req, res, next) => {
   try {
     const options = pick(req.query, ["page", "size", "sortBy", "sortOrder"]);
 
-    const search = pick(req.query, ["searchTerm"]);
+    const search = pick(req.query, [
+      "searchTerm",
+      "minPrice",
+      "maxPrice",
+      "category",
+    ]);
 
-    const result = await bookServices.getAllBooks(options);
+    const result = await bookServices.getAllBooks(options, search);
 
     res.status(200).json({
       statusCode: 200,
       success: true,
       message: "Books Retrieved Successfully 🦀",
-      data: result,
+      meta: result,
     });
   } catch (err: any) {
     console.log(err);

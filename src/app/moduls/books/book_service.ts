@@ -1,5 +1,6 @@
-import { Book } from "@prisma/client";
-import { IOptions } from "../../types";
+import { Book, Prisma } from "@prisma/client";
+import { BooksResponse, ISearch } from "../../types";
+import calculatePagination, { IOptions } from "../../utils/pagination";
 import prisma from "../../utils/prismaDB";
 
 const createSingleBook = async (data: Book): Promise<Book> => {
@@ -12,15 +13,84 @@ const createSingleBook = async (data: Book): Promise<Book> => {
   return result;
 };
 
-const getAllBooks = async (options: IOptions): Promise<Book[] | null> => {
-  const skip = Number(options.page) - 1 + Number(options.size);
+const getAllBooks = async (
+  options: IOptions,
+  search: ISearch
+): Promise<BooksResponse> => {
+  const { page, size, skip } = calculatePagination(options);
+
+  const { searchTerm, minPrice, maxPrice, ...filterData } = search;
+
+  const total = await prisma.book.count();
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: ["title", "author", "genre", "publicationDate"].map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (maxPrice !== null) {
+    andConditions.push({
+      price: {
+        lte: Number(maxPrice),
+      },
+    });
+  } else if (minPrice !== null) {
+    andConditions.push({
+      price: {
+        gte: Number(minPrice),
+      },
+    });
+  } else if (minPrice !== null && maxPrice !== null) {
+    andConditions.push({
+      price: {
+        gte: Number(minPrice),
+        lte: Number(maxPrice),
+      },
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.BookWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.book.findMany({
-    take: Number(options.size),
     skip,
+    take: size,
+    where: whereConditions,
+
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {},
   });
 
-  return result;
+  return {
+    meta: {
+      page: page,
+      size: size,
+      total,
+    },
+    data: result,
+  };
 };
 
 const getBooksByCategory = async (categoryId: string) => {
