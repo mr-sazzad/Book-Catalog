@@ -11,7 +11,6 @@ export const createOrder: RequestHandler = async (req, res, next) => {
     ) as JwtPayload;
 
     const id = await decoded.id;
-    console.log(decoded, id);
 
     const orderData = req.body;
     const result = await orderServices.createOrder(id, orderData);

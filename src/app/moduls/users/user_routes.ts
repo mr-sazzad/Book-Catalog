@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { roleAuth } from "../../middleware/roleAuth";
+import validateRequest from "../../middleware/validateRequest";
 import {
   createSingleUser,
   deleteSingleUser,
@@ -8,10 +9,11 @@ import {
   loginUser,
   updateSingleUser,
 } from "./user_controller";
+import { createUser } from "./user_validation";
 
 const router = Router();
 
-router.post("/auth/signup", createSingleUser);
+router.post("/auth/signup", validateRequest(createUser), createSingleUser);
 router.post("/auth/signin", loginUser);
 router.get("/", roleAuth(["ADMIN"]), getAllUsers);
 router.get("/:id", getSingleUser);
