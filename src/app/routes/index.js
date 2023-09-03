@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.globalRouter = void 0;
+const express_1 = require("express");
+const book_routes_1 = require("../moduls/books/book_routes");
+const category_routes_1 = require("../moduls/categories/category_routes");
+const order_routes_1 = require("../moduls/orders/order_routes");
+const user_routes_1 = require("../moduls/users/user_routes");
+const router = (0, express_1.Router)();
+router.use("/users", user_routes_1.userRouter);
+router.use("/categories", category_routes_1.categoryRoutes);
+router.use("/books", book_routes_1.bookRoutes);
+router.use("/orders", order_routes_1.orderRoutes);
+exports.globalRouter = router;
