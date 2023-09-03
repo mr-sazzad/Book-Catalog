@@ -16,7 +16,7 @@ const router = Router();
 router.post("/auth/signup", validateRequest(createUser), createSingleUser);
 router.post("/auth/signin", loginUser);
 router.get("/", roleAuth(["ADMIN"]), getAllUsers);
-router.get("/:id", getSingleUser);
+router.get("/:id", roleAuth(["ADMIN"]), getSingleUser);
 router.patch("/:id", roleAuth(["ADMIN"]), updateSingleUser);
 router.delete("/:id", roleAuth(["ADMIN"]), deleteSingleUser);
 

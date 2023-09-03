@@ -26,22 +26,7 @@ export const createOrder: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const getAllOrders: RequestHandler = async (req, res, next) => {
-  try {
-    const result = await orderServices.getAllOrders();
-
-    res.status(200).json({
-      statusCode: 200,
-      success: true,
-      message: "Order Retrieved Successfully ✅",
-      data: result,
-    });
-  } catch (err: any) {
-    next(err);
-  }
-};
-
-export const getOwnOrders: RequestHandler = async (req, res, next) => {
+export const getWholeOrders: RequestHandler = async (req, res, next) => {
   try {
     const token = req.headers.authorization as string;
     const decoded = jwt.verify(
@@ -49,9 +34,9 @@ export const getOwnOrders: RequestHandler = async (req, res, next) => {
       process.env.JWT_SECRET as string
     ) as JwtPayload;
 
-    const id = decoded.id;
+    const userId = await decoded.id;
 
-    const result = await orderServices.getOwnOrders(id);
+    const result = await orderServices.getWholeOrders(userId);
 
     res.status(200).json({
       statusCode: 200,
@@ -59,7 +44,7 @@ export const getOwnOrders: RequestHandler = async (req, res, next) => {
       message: "Order Retrieved Successfully ✅",
       data: result,
     });
-  } catch (err: any) {
+  } catch (err) {
     next(err);
   }
 };
