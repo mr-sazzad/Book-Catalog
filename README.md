@@ -15,7 +15,7 @@
 
 ### ROUTES 📍
 ```css
-✅ BASE URL  api/v1
+✅ BASE URL  https://assignment-8-ten.vercel.app/api/v1
 ```
 
 ```js
