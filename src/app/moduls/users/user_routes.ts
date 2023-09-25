@@ -10,8 +10,8 @@ import {
 const router = Router();
 
 router.get("/:id", roleAuth(["ADMIN"]), getSingleUser);
-router.get("/", roleAuth(["ADMIN"]), getAllUsers);
 router.patch("/:id", roleAuth(["ADMIN"]), updateSingleUser);
 router.delete("/:id", roleAuth(["ADMIN"]), deleteSingleUser);
+router.get("/", roleAuth(["ADMIN"]), getAllUsers);
 
 export const userRouter = router;

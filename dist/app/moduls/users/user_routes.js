@@ -6,7 +6,7 @@ const roleAuth_1 = require("../../middleware/roleAuth");
 const user_controller_1 = require("./user_controller");
 const router = (0, express_1.Router)();
 router.get("/:id", (0, roleAuth_1.roleAuth)(["ADMIN"]), user_controller_1.getSingleUser);
-router.get("/", (0, roleAuth_1.roleAuth)(["ADMIN"]), user_controller_1.getAllUsers);
 router.patch("/:id", (0, roleAuth_1.roleAuth)(["ADMIN"]), user_controller_1.updateSingleUser);
 router.delete("/:id", (0, roleAuth_1.roleAuth)(["ADMIN"]), user_controller_1.deleteSingleUser);
+router.get("/", (0, roleAuth_1.roleAuth)(["ADMIN"]), user_controller_1.getAllUsers);
 exports.userRouter = router;
