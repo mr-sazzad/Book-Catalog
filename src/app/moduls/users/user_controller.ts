@@ -1,42 +1,17 @@
 import { RequestHandler } from "express";
+import ApiError from "../../errors/apiError";
 import { userServices } from "./user_service";
 
-export const createSingleUser: RequestHandler = async (req, res, next) => {
-  try {
-    const user = req.body;
-
-    const result = await userServices.createSingleUser(user);
-
-    res.status(201).json({
-      statusCode: 201,
-      success: true,
-      message: "User Created Successfully ✅",
-      data: result,
-    });
-  } catch (err: any) {
-    console.log(err);
-    next(err);
-  }
-};
-
-export const loginUser: RequestHandler = async (req, res, next) => {
-  const loginData = req.body;
-  const result = await userServices.loginUser(loginData);
-
-  res.status(201).json({
-    statusCode: 201,
-    success: true,
-    message: "User Logged In Successfully ✅",
-    data: result,
-  });
-};
-
 export const getAllUsers: RequestHandler = async (req, res, next) => {
-  const result = await userServices.getAllUsers();
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(409, "Unauthorized");
+  }
+  const result = await userServices.getAllUsers(token);
 
   res.status(200).json({
-    statusCode: 200,
     success: true,
+    statusCode: 200,
     message: "Users Retrieved Successfully 👨‍👩‍👧‍👦",
     data: result,
   });
@@ -44,7 +19,11 @@ export const getAllUsers: RequestHandler = async (req, res, next) => {
 
 export const getSingleUser: RequestHandler = async (req, res, next) => {
   const id = req.params.id;
-  const result = await userServices.getSingleUser(id);
+  const token = req.headers.authorization;
+  if (!token) {
+    throw new ApiError(409, "Unauthorized");
+  }
+  const result = await userServices.getSingleUser(token, id);
 
   res.status(200).json({
     statusCode: 200,
@@ -57,24 +36,34 @@ export const getSingleUser: RequestHandler = async (req, res, next) => {
 export const updateSingleUser: RequestHandler = async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
-  const result = await userServices.updateSingleUser(id, data);
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new ApiError(409, "Unauthorized");
+  }
+  const result = await userServices.updateSingleUser(token, id, data);
 
   res.status(201).json({
-    statusCode: 201,
     success: true,
-    message: "User Updated Successfully ✅",
+    statusCode: 201,
+    message: "User Updated Successfully",
     data: result,
   });
 };
 
 export const deleteSingleUser: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
-  const result = await userServices.deleteSingleUser(id);
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new ApiError(409, "Unauthorized");
+  }
+  const result = await userServices.deleteSingleUser(token, id);
 
   res.status(200).json({
-    statusCode: 200,
     success: true,
-    message: "User Deleted Successfully 🔴",
+    statusCode: 200,
+    message: "User Deleted Successfully",
     data: result,
   });
 };

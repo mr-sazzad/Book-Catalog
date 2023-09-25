@@ -42,9 +42,9 @@ app.get("/", (req, res) => {
         Date: "01/09/23",
         name: "Assignment-8",
         tools: "Prisma Express PostgreSQL Typescript",
-        routes: "base url -> http://localhost:5000/api/v1",
-        users: " base url -> http://localhost:5000/api/v1/users 🦀",
-        category: " base url -> http://localhost:5000/api/v1/categories ⚖️",
+        routes: "base url -> https://assignment-8-ten.vercel.app/api/v1",
+        users: " base url -> https://assignment-8-ten.vercel.app/api/v1/users 🦀",
+        category: " base url -> https://assignment-8-ten.vercel.app/api/v1/categories ⚖️",
     });
 });
 app.use("/api/v1", routes_1.globalRouter);

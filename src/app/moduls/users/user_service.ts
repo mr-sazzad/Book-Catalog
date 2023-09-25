@@ -1,49 +1,51 @@
 import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import ApiError from "../../errors/apiError";
+import { TokenData } from "../../types";
 import prisma from "../../utils/prismaDB";
 
-const secret = process.env.JWT_SECRET;
+const getAllUsers = async (token: string): Promise<User[]> => {
+  const decode = jwt.decode(token) as TokenData;
 
-const createSingleUser = async (data: User): Promise<User> => {
-  const result = await prisma.user.create({
-    data,
-  });
-
-  return result;
-};
-
-const loginUser = async (data: Partial<User>): Promise<string> => {
-  const email = data.email;
-
-  const isExist = await prisma.user.findFirst({
+  const isUserExist = await prisma.user.findUnique({
     where: {
-      email,
+      id: decode.userId,
     },
   });
 
-  if (!isExist) {
-    throw new Error("Not Authenticated");
+  if (!isUserExist) {
+    throw new ApiError(401, "Invalid Credentials");
   }
 
-  const jwt_payload = {
-    id: isExist.id,
-    email: isExist.email,
-    role: isExist.role,
-    address: isExist.address,
-  };
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
 
-  const token = jwt.sign(jwt_payload, secret as string, { expiresIn: "365d" });
-
-  return token;
-};
-
-const getAllUsers = async (): Promise<User[]> => {
   const result = await prisma.user.findMany({});
 
   return result;
 };
 
-const getSingleUser = async (id: string): Promise<User | null> => {
+const getSingleUser = async (
+  token: string,
+  id: string
+): Promise<User | null> => {
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
   const result = await prisma.user.findUnique({
     where: {
       id,
@@ -54,17 +56,34 @@ const getSingleUser = async (id: string): Promise<User | null> => {
 };
 
 const updateSingleUser = async (
+  token: string,
   id: string,
   payload: Partial<User>
 ): Promise<User> => {
-  const isExist = await prisma.user.findFirst({
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isUserExist = await prisma.user.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
-    throw new Error("Resource Not Found ! 🦀");
+  if (!isUserExist) {
+    throw new ApiError(404, "Resource Not Found !");
   }
 
   const result = await prisma.user.update({
@@ -76,15 +95,31 @@ const updateSingleUser = async (
   return result;
 };
 
-const deleteSingleUser = async (id: string): Promise<User> => {
-  const isExist = await prisma.user.findFirst({
+const deleteSingleUser = async (token: string, id: string): Promise<User> => {
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isUserExist = await prisma.user.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
-    throw new Error("Resource Not Found ! 🦀");
+  if (!isUserExist) {
+    throw new ApiError(404, "Resource Not Found !");
   }
 
   const result = await prisma.user.delete({
@@ -96,8 +131,6 @@ const deleteSingleUser = async (id: string): Promise<User> => {
 };
 
 export const userServices = {
-  createSingleUser,
-  loginUser,
   getAllUsers,
   getSingleUser,
   updateSingleUser,

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.roleAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prismaDB_1 = __importDefault(require("../utils/prismaDB"));
-const secret = process.env.JWT_SECRET;
+const SECRET = process.env.JWT_SECRET;
 const roleAuth = (requiredRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.headers.authorization;
@@ -24,15 +24,15 @@ const roleAuth = (requiredRoles) => (req, res, next) => __awaiter(void 0, void 0
         }
         let decoded;
         try {
-            decoded = jsonwebtoken_1.default.verify(token, secret);
+            decoded = jsonwebtoken_1.default.verify(token, SECRET);
         }
         catch (error) {
             return res.status(401).json({ error: "Unauthorized 🦀" });
         }
-        const email = decoded.email;
+        const userId = decoded.userId;
         const user = yield prismaDB_1.default.user.findUnique({
             where: {
-                email,
+                id: userId,
             },
         });
         if (!user) {

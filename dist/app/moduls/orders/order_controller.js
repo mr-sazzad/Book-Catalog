@@ -8,24 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWholeOrders = exports.createOrder = void 0;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+exports.getOrdersById = exports.getWholeOrders = exports.createOrder = void 0;
 const order_services_1 = require("./order_services");
 const createOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.headers.authorization;
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        const id = yield decoded.id;
         const orderData = req.body;
-        const result = yield order_services_1.orderServices.createOrder(id, orderData);
+        const result = yield order_services_1.orderServices.createOrder(token, orderData);
         res.status(201).json({
-            statusCode: 201,
             success: true,
-            message: "Order Created Successfully ✅",
+            statusCode: 201,
+            message: "Order Created Successfully",
             data: result,
         });
     }
@@ -37,13 +31,11 @@ exports.createOrder = createOrder;
 const getWholeOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.headers.authorization;
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        const userId = yield decoded.id;
-        const result = yield order_services_1.orderServices.getWholeOrders(userId);
+        const result = yield order_services_1.orderServices.getWholeOrders(token);
         res.status(200).json({
-            statusCode: 200,
             success: true,
-            message: "Order Retrieved Successfully ✅",
+            statusCode: 200,
+            message: "Order Retrieved Successfully",
             data: result,
         });
     }
@@ -52,3 +44,20 @@ const getWholeOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.getWholeOrders = getWholeOrders;
+const getOrdersById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = req.headers.authorization;
+        const { id } = req.params;
+        const result = yield order_services_1.orderServices.getOrdersById(token, id);
+        res.status(200).json({
+            success: true,
+            status: 200,
+            message: "Orders retrieved successfully",
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.getOrdersById = getOrdersById;

@@ -1,9 +1,27 @@
 import { Book, Prisma } from "@prisma/client";
-import { BooksResponse, ISearch } from "../../types";
+import jwt from "jsonwebtoken";
+import ApiError from "../../errors/apiError";
+import { BooksResponse, ISearch, TokenData } from "../../types";
 import calculatePagination, { IOptions } from "../../utils/pagination";
 import prisma from "../../utils/prismaDB";
 
-const createSingleBook = async (data: Book): Promise<Book> => {
+const createSingleBook = async (token: string, data: Book): Promise<Book> => {
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
   const result = await prisma.book.create({
     data,
     include: {
@@ -114,7 +132,7 @@ const getSingleBook = async (id: string): Promise<Book | null> => {
   });
 
   if (!isExist) {
-    throw new Error("Resource Not Found 🦀");
+    throw new ApiError(404, "Resource Not Found");
   }
 
   const result = prisma.book.findUnique({
@@ -127,16 +145,33 @@ const getSingleBook = async (id: string): Promise<Book | null> => {
 };
 
 const updateSingleBook = async (
+  token: string,
   id: string,
   data: Partial<Book>
 ): Promise<Book> => {
-  const isExist = await prisma.book.findFirst({
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isBookExist = await prisma.book.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
+  if (!isBookExist) {
     throw new Error("Resource Not Found 🦀");
   }
 
@@ -150,14 +185,30 @@ const updateSingleBook = async (
   return result;
 };
 
-const deleteSingleBook = async (id: string): Promise<Book> => {
-  const isExist = await prisma.book.findFirst({
+const deleteSingleBook = async (token: string, id: string): Promise<Book> => {
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isBookExist = await prisma.book.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
+  if (!isBookExist) {
     throw new Error("Resource Not Found 🦀");
   }
 

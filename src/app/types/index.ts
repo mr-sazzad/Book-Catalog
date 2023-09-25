@@ -14,3 +14,10 @@ export interface BooksResponse {
   };
   data: Book[];
 }
+
+export interface TokenData {
+  userId: string;
+  role: string;
+  iat: number;
+  exp: number;
+}

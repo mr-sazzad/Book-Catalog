@@ -1,20 +1,24 @@
 import { RequestHandler } from "express";
+import ApiError from "../../errors/apiError";
 import { pick } from "../../utils/pick";
 import { bookServices } from "./book_service";
 
 export const createSingleBook: RequestHandler = async (req, res, next) => {
   try {
     const bookData = req.body;
-    const result = await bookServices.createSingleBook(bookData);
+    const token = req.headers.authorization;
+    if (!token) {
+      throw new ApiError(409, "Unauthorized");
+    }
+    const result = await bookServices.createSingleBook(token, bookData);
 
     res.status(201).json({
-      statusCode: 201,
       success: true,
-      message: "Book Created Successfully ✅",
+      statusCode: 201,
+      message: "Book Created Successfully",
       data: result,
     });
   } catch (err: any) {
-    console.log(err);
     next(err);
   }
 };
@@ -33,13 +37,12 @@ export const getAllBooks: RequestHandler = async (req, res, next) => {
     const result = await bookServices.getAllBooks(options, search);
 
     res.status(200).json({
-      statusCode: 200,
       success: true,
-      message: "Books Retrieved Successfully 🦀",
+      statusCode: 200,
+      message: "Books Retrieved Successfully",
       meta: result,
     });
   } catch (err: any) {
-    console.log(err);
     next(err);
   }
 };
@@ -50,13 +53,12 @@ export const getSingleBook: RequestHandler = async (req, res, next) => {
     const result = await bookServices.getSingleBook(id);
 
     res.status(200).json({
-      statusCode: 200,
       success: true,
-      message: "Book Retrieved Successfully 🦀",
+      statusCode: 200,
+      message: "Book Retrieved Successfully",
       data: result,
     });
   } catch (err: any) {
-    console.log(err);
     next(err);
   }
 };
@@ -65,16 +67,20 @@ export const updateSingleBook: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const payload = req.body;
-    const result = await bookServices.updateSingleBook(id, payload);
+    const token = req.headers.authorization;
+
+    if (!token) {
+      throw new ApiError(409, "Unauthorized");
+    }
+    const result = await bookServices.updateSingleBook(token, id, payload);
 
     res.status(201).json({
-      statusCode: 201,
       success: true,
-      message: "Book Updated Successfully ✅",
+      statusCode: 201,
+      message: "Book Updated Successfully",
       data: result,
     });
   } catch (err: any) {
-    console.log(err);
     next(err);
   }
 };
@@ -82,16 +88,36 @@ export const updateSingleBook: RequestHandler = async (req, res, next) => {
 export const deleteSingleBook: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await bookServices.deleteSingleBook(id);
+    const token = req.headers.authorization;
+
+    if (!token) {
+      throw new ApiError(409, "Unauthorized");
+    }
+    const result = await bookServices.deleteSingleBook(token, id);
 
     res.status(200).json({
-      statusCode: 200,
       success: true,
-      message: "Book Deleted Successfully 🔴",
+      statusCode: 200,
+      message: "Book Deleted Successfully",
       data: result,
     });
   } catch (err: any) {
-    console.log(err);
+    next(err);
+  }
+};
+
+export const getBooksByCategory: RequestHandler = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await bookServices.getBooksByCategory(id);
+
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Books with associated category data fetched successfully",
+      data: result,
+    });
+  } catch (err: any) {
     next(err);
   }
 };

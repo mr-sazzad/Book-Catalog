@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import prisma from "../utils/prismaDB";
 
-const secret = process.env.JWT_SECRET;
+const SECRET = process.env.JWT_SECRET;
 
 export const roleAuth =
   (requiredRoles: string[]) =>
@@ -17,16 +17,16 @@ export const roleAuth =
       let decoded: JwtPayload;
 
       try {
-        decoded = jwt.verify(token, secret as string) as JwtPayload;
+        decoded = jwt.verify(token, SECRET as string) as JwtPayload;
       } catch (error) {
         return res.status(401).json({ error: "Unauthorized 🦀" });
       }
 
-      const email = decoded.email;
+      const userId = decoded.userId;
 
       const user = await prisma.user.findUnique({
         where: {
-          email,
+          id: userId,
         },
       });
 

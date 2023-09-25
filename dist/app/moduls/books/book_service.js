@@ -24,9 +24,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookServices = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const apiError_1 = __importDefault(require("../../errors/apiError"));
 const pagination_1 = __importDefault(require("../../utils/pagination"));
 const prismaDB_1 = __importDefault(require("../../utils/prismaDB"));
-const createSingleBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const createSingleBook = (token, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const decode = jsonwebtoken_1.default.decode(token);
+    const isExist = yield prismaDB_1.default.user.findUnique({
+        where: {
+            id: decode.userId,
+        },
+    });
+    if (!isExist) {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
+    if (decode.role !== "ADMIN") {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
     const result = yield prismaDB_1.default.book.create({
         data,
         include: {
@@ -119,7 +133,7 @@ const getSingleBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     if (!isExist) {
-        throw new Error("Resource Not Found 🦀");
+        throw new apiError_1.default(404, "Resource Not Found");
     }
     const result = prismaDB_1.default.book.findUnique({
         where: {
@@ -128,13 +142,25 @@ const getSingleBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
-const updateSingleBook = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield prismaDB_1.default.book.findFirst({
+const updateSingleBook = (token, id, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const decode = jsonwebtoken_1.default.decode(token);
+    const isExist = yield prismaDB_1.default.user.findUnique({
+        where: {
+            id: decode.userId,
+        },
+    });
+    if (!isExist) {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
+    if (decode.role !== "ADMIN") {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
+    const isBookExist = yield prismaDB_1.default.book.findFirst({
         where: {
             id,
         },
     });
-    if (!isExist) {
+    if (!isBookExist) {
         throw new Error("Resource Not Found 🦀");
     }
     const result = prismaDB_1.default.book.update({
@@ -145,13 +171,25 @@ const updateSingleBook = (id, data) => __awaiter(void 0, void 0, void 0, functio
     });
     return result;
 });
-const deleteSingleBook = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const isExist = yield prismaDB_1.default.book.findFirst({
+const deleteSingleBook = (token, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const decode = jsonwebtoken_1.default.decode(token);
+    const isExist = yield prismaDB_1.default.user.findUnique({
+        where: {
+            id: decode.userId,
+        },
+    });
+    if (!isExist) {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
+    if (decode.role !== "ADMIN") {
+        throw new apiError_1.default(401, "Invalid Credentials");
+    }
+    const isBookExist = yield prismaDB_1.default.book.findFirst({
         where: {
             id,
         },
     });
-    if (!isExist) {
+    if (!isBookExist) {
         throw new Error("Resource Not Found 🦀");
     }
     const result = yield prismaDB_1.default.book.delete({

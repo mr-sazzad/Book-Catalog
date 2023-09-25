@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { roleAuth } from "../../middleware/roleAuth";
 import validateRequest from "../../middleware/validateRequest";
-import { createOrder, getWholeOrders } from "./order_controller";
+import { createOrder, getOrdersById, getWholeOrders } from "./order_controller";
 import { create } from "./orders_validation";
 
 const router = Router();
@@ -14,5 +14,7 @@ router.post(
 );
 
 router.get("/", roleAuth(["CUSTOMER", "ADMIN"]), getWholeOrders);
+
+router.get("/:id", roleAuth(["CUSTOMER", "ADMIN"]), getOrdersById);
 
 export const orderRoutes = router;

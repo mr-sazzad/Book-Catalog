@@ -1,17 +1,38 @@
 import { Category } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import ApiError from "../../errors/apiError";
+import { TokenData } from "../../types";
 import prisma from "../../utils/prismaDB";
 
-const createCategory = async (data: Category): Promise<Category> => {
+const createCategory = async (
+  token: string,
+  data: Category
+): Promise<Category> => {
   const title = data.title;
+  const decode = jwt.decode(token) as TokenData;
 
-  const isExist = await prisma.category.findFirst({
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isCategoryExist = await prisma.category.findFirst({
     where: {
       title,
     },
   });
 
-  if (isExist) {
-    throw new Error("Category already Exist 🔴");
+  if (isCategoryExist) {
+    throw new ApiError(409, "Category already Exist");
   }
 
   const result = await prisma.category.create({
@@ -32,10 +53,13 @@ const getSingleCategory = async (id: string): Promise<Category | null> => {
     where: {
       id,
     },
+    include: {
+      books: true,
+    },
   });
 
   if (!isExist) {
-    throw new Error("Category Not Found 🔴");
+    throw new ApiError(404, "Category Not Found");
   }
 
   const result = await prisma.category.findUnique({
@@ -48,17 +72,33 @@ const getSingleCategory = async (id: string): Promise<Category | null> => {
 };
 
 const updateSingleCategory = async (
+  token: string,
   id: string,
   data: Partial<Category>
 ): Promise<Category | null> => {
-  const isExist = await prisma.category.findFirst({
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+  const isCategoryExist = await prisma.category.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
-    throw new Error("Category Not Found 🔴");
+  if (!isCategoryExist) {
+    throw new ApiError(404, "Category Not Found");
   }
 
   const result = await prisma.category.update({
@@ -71,16 +111,51 @@ const updateSingleCategory = async (
   return result;
 };
 
-const deleteSingleCategory = async (id: string): Promise<Category | null> => {
-  const isExist = await prisma.category.findFirst({
+const deleteSingleCategory = async (
+  token: string,
+  id: string
+): Promise<Category | null> => {
+  const decode = jwt.decode(token) as TokenData;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      id: decode.userId,
+    },
+  });
+
+  if (!isExist) {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  if (decode.role !== "ADMIN") {
+    throw new ApiError(401, "Invalid Credentials");
+  }
+
+  const isCategoryExist = await prisma.category.findFirst({
     where: {
       id,
     },
   });
 
-  if (!isExist) {
-    throw new Error("Category Not Found 🔴");
+  if (!isCategoryExist) {
+    throw new ApiError(404, "Category Not Found");
   }
+
+  const books = await prisma.book.findMany({
+    where: {
+      categoryId: id,
+    },
+  });
+
+  await Promise.all(
+    books.map(async (book) => {
+      await prisma.book.delete({
+        where: {
+          id: book.id,
+        },
+      });
+    })
+  );
 
   const result = await prisma.category.delete({
     where: {

@@ -1,24 +1,17 @@
 import { RequestHandler } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { orderServices } from "./order_services";
 
 export const createOrder: RequestHandler = async (req, res, next) => {
   try {
     const token = req.headers.authorization as string;
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload;
-
-    const id = await decoded.id;
 
     const orderData = req.body;
-    const result = await orderServices.createOrder(id, orderData);
+    const result = await orderServices.createOrder(token, orderData);
 
     res.status(201).json({
-      statusCode: 201,
       success: true,
-      message: "Order Created Successfully ✅",
+      statusCode: 201,
+      message: "Order Created Successfully",
       data: result,
     });
   } catch (err: any) {
@@ -29,22 +22,34 @@ export const createOrder: RequestHandler = async (req, res, next) => {
 export const getWholeOrders: RequestHandler = async (req, res, next) => {
   try {
     const token = req.headers.authorization as string;
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload;
 
-    const userId = await decoded.id;
-
-    const result = await orderServices.getWholeOrders(userId);
+    const result = await orderServices.getWholeOrders(token);
 
     res.status(200).json({
-      statusCode: 200,
       success: true,
-      message: "Order Retrieved Successfully ✅",
+      statusCode: 200,
+      message: "Order Retrieved Successfully",
       data: result,
     });
   } catch (err) {
+    next(err);
+  }
+};
+
+export const getOrdersById: RequestHandler = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization as string;
+    const { id } = req.params;
+
+    const result = await orderServices.getOrdersById(token, id);
+
+    res.status(200).json({
+      success: true,
+      status: 200,
+      message: "Orders retrieved successfully",
+      data: result,
+    });
+  } catch (err: any) {
     next(err);
   }
 };
